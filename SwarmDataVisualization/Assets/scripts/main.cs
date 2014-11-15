@@ -8,19 +8,16 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 namespace AssemblyCSharp
 {
-	public class BoidMove : MonoBehaviour {
-
-		void updateBoid(Boid boid, Vector3 a1, Vector3 a2, Vector3 a3, int dt){
-			boid.velocity = boid.velocity + a1*dt+a2*dt+a3*dt;
-			boid.position = boid.position + boid.velocity;
-		}
-
-		void Update () {
-			transform.position = new Vector3(transform.position.x + 0.001f, transform.position.y);
+	public class main : MonoBehaviour {
+			public GameObject Boid;
+			
+		public void Start(){
+				GameObject boid = (GameObject)Instantiate(Boid);
+				boid.transform.position = new Vector3(0, 0, 0);
 		}
 	}
 }
