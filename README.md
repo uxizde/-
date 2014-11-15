@@ -1,7 +1,7 @@
 RPI Hackathon 2014
 ========
 
-references
+References
 -------
 Flocking
 
