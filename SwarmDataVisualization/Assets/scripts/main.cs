@@ -19,6 +19,20 @@ namespace AssemblyCSharp
 				GameObject boid = (GameObject)Instantiate(Boid);
 				boid.transform.position = new Vector3(0, 0, 0);
 		}
+
+/*		public Vector3 cohesion(Boid boid){
+
+		}
+		public Vector3 seperation(Boid boid){
+			
+		}
+		public Vector3 allignment(Boid boid){
+			
+		}*/
+
+		public void Update(){
+
+		}
 	}
 }
 

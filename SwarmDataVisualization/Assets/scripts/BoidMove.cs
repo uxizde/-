@@ -13,8 +13,7 @@ using UnityEngine;
 namespace AssemblyCSharp
 {
 	public class BoidMove : MonoBehaviour {
-
-		void updateBoid(Boid boid, Vector3 a1, Vector3 a2, Vector3 a3, int dt){
+		public BoidMove(Boid boid, Vector3 a1, Vector3 a2, Vector3 a3, int dt){
 			boid.velocity = boid.velocity + a1*dt+a2*dt+a3*dt;
 			boid.position = boid.position + boid.velocity;
 		}
