@@ -17,7 +17,7 @@ namespace AssemblyCSharp{
 		public GameObject Predator;
 		public List<GameObject> Boids;
 		public List<GameObject> Predators;
-		int numbBoids =50;
+		int numbBoids =55;
 		int numbPreds = 1;
 		public float dt = 0.00005f;
 		const float kCohesion = -0.001f;
@@ -31,9 +31,9 @@ namespace AssemblyCSharp{
 			for(int i=0;i<numbBoids;i++){
 				GameObject boid = (GameObject)Instantiate(Boid);
 				boid.name = "boid"+i;
-				float rand1 = (float)GetRandomNumber (-2.0,2.0);
-				float rand2 = (float)GetRandomNumber (-2.0,2.0);
-				float rand3 = (float)GetRandomNumber (-2.0,2.0);
+				float rand1 = (float)GetRandomNumber (-5.0,5.0);
+				float rand2 = (float)GetRandomNumber (-5.0,5.0);
+				float rand3 = (float)GetRandomNumber (-5.0,5.0);
 				boid.transform.position = new Vector3(rand1, 0f, rand3);
 				
 				Boid b = boid.GetComponent<Boid>();
@@ -187,10 +187,9 @@ namespace AssemblyCSharp{
 		}
 		
 		public void limitVel(Boid boid){
-			float vlim = .05f;
 			Vector3 vel = new Vector3 (0.0f, 0.0f, 0.0f);
-			if(boid.velocity.magnitude > vlim){
-				boid.velocity = (boid.velocity / boid.velocity.magnitude) * vlim;
+			if(boid.velocity.magnitude > boid.vlim){
+				boid.velocity = (boid.velocity / boid.velocity.magnitude) * boid.vlim;
 			}
 		}
 		
@@ -203,12 +202,12 @@ namespace AssemblyCSharp{
 		}
 		
 		public Vector3 limitPos(Boid boid){
-			int xmin = -10;
-			int xmax = 10;
-			int ymin = -10; 
-			int ymax = 10;
-			int zmin = -10;
-			int zmax = 10;
+			float xmin = -15.0f;
+			float xmax = 15.0f;
+			float ymin = -6.0f; 
+			float ymax = 6.0f;
+			float zmin = -10.0f;
+			float zmax = 10.0f;
 			Vector3 vel = new Vector3 (0.0f, 0.0f, 0.0f);
 			
 			if(boid.transform.position.x < xmin){
@@ -232,14 +231,8 @@ namespace AssemblyCSharp{
 			
 			return vel;
 		}
-		
-		float t =0.0f;
-		float speed = (2*Mathf.PI)/200.0f;
-		float radius = 100.0f;
-		public Vector3 attraction(Boid boid){
-			t += speed*Time.deltaTime;
-			Vector3 loc = new Vector3 ((float)Math.Cos (t)*radius, 0.0f, (float)Math.Sin (t)*radius);
-			
+
+		public Vector3 attraction(Boid boid){ 
 			return (Predator.transform.position - boid.transform.position).normalized;
 		}
 		
@@ -249,7 +242,7 @@ namespace AssemblyCSharp{
 			float k = 0.001f;
 			foreach (GameObject b in Boids) {
 				float dist = Vector3.Distance(predator.transform.position,b.transform.position);
-				if(dist < .3 && dist > 0){
+				if(dist < 5 && dist > 0){
 					accel = accel + b.transform.position;
 					count++;
 				}
@@ -271,9 +264,12 @@ namespace AssemblyCSharp{
 				Boid boid = b.GetComponent<Boid>();
 				
 				Vector3 a4 = new Vector3();
-				if((b.transform.position - Predator.transform.position).magnitude<.08){
+				if((b.transform.position - Predator.transform.position).magnitude<=1){
+					print ("omg"+b.name);
 					k1 = -1;
 					a4 = -k4*attraction(boid);
+					boid.vlim = 0.1f;
+					boid.velocity =boid.velocity*2;
 				}
 				else{
 					k1 = 1;
@@ -289,7 +285,7 @@ namespace AssemblyCSharp{
 				float rand2 = (float)GetRandomNumber (-.01,.01);
 				float rand3 = (float)GetRandomNumber (-.01,.01);
 				boid.velocity.x = boid.velocity.x + rand1;
-				//boid.velocity.y = boid.velocity.y + rand2;
+				boid.velocity.y = boid.velocity.y + rand2;
 				boid.velocity.z = boid.velocity.z + rand3;
 				limitVel(boid);
 				boid.move();
