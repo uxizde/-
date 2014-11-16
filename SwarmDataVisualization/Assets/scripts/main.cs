@@ -20,7 +20,7 @@ namespace AssemblyCSharp{
 		public float dt = 0.005f;
 		const float kCohesion = -0.01f;
 		const float kSeperation = 0.0001f;
-		const float kAlignment = -0.005f;
+		const float kAlignment = -0.01f;
 
 		public void Start(){
 			Boids = new List<GameObject>();
