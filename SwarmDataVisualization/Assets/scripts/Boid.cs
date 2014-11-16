@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
-<<<<<<< HEAD
 <<<<<<< HEAD
 public class Boid : MonoBehaviour {
 	public int state = 1;
@@ -69,10 +69,4 @@ public class Boid : MonoBehaviour
 				System.Console.WriteLine (boid1.AccelSep (boids).x);
 		}
 >>>>>>> origin/master
-=======
-public class Boid : MonoBehaviour {
-	public int state = 1;
-	public Vector3 position { get; set; }
-	public Vector3 velocity { get; set; }
->>>>>>> 9592994c57cf481f41575f7f81abfa86b5592928
 }
