@@ -16,7 +16,9 @@ namespace AssemblyCSharp{
 		public GameObject Boid;
 		public GameObject Predator;
 		public List<GameObject> Boids;
+		public List<GameObject> Predators;
 		int numbBoids =50;
+		int numbPreds = 1;
 		public float dt = 0.00005f;
 		const float kCohesion = -0.001f;
 		const float kSeperation = 0.0001f;
@@ -24,11 +26,7 @@ namespace AssemblyCSharp{
 
 		public void Start(){
 			Boids = new List<GameObject>();
-
-			GameObject pred = (GameObject)Instantiate (Predator);
-			pred.transform.position = new Vector3(-5f,0f,-5f);
-			Predator p = pred.GetComponent<Predator>();
-			p.velocity = new Vector3(0.08f,0.0f,0.08f);
+			Predators = new List<GameObject>();
 			
 			for(int i=0;i<numbBoids;i++){
 				GameObject boid = (GameObject)Instantiate(Boid);
@@ -46,7 +44,14 @@ namespace AssemblyCSharp{
 
 				Boids.Add (boid);
 			}
-
+			for(int i =0;i<numbPreds;i++){
+				GameObject pred = (GameObject)Instantiate (Predator);
+				pred.name = "pred"+i;
+				pred.transform.position = new Vector3(-5f,0f,-5f);
+				Predator p = pred.GetComponent<Predator>();
+				p.velocity = new Vector3(0.08f,0.0f,0.08f);
+				Predators.Add(pred);
+			}
 		}
 
 		static System.Random random = new System.Random();
@@ -55,7 +60,7 @@ namespace AssemblyCSharp{
 		}
 
 		public Vector3 cohesion(Boid boid){
-			List<Vector3> positions = new List<Vector3> ();
+	/*		List<Vector3> positions = new List<Vector3> ();
 			Vector3 thisPosition = boid.transform.position;
 			Vector3 predPosition = Predator.transform.position;
 			foreach (GameObject b in Boids) {
@@ -79,8 +84,8 @@ namespace AssemblyCSharp{
 			else 
 				accel = Vector3.zero;
 
-			return accel;
-		/*	Vector3 accel = new Vector3();
+			return accel;*/
+			Vector3 accel = new Vector3();
 			int count =0;
 			float k = 0.001f;
 			foreach (GameObject b in Boids) {
@@ -94,7 +99,7 @@ namespace AssemblyCSharp{
 					return accel-boid.transform.position;
 				}
 			}
-			return k*accel;*/
+			return k*accel;
 		}
 		public Vector3 seperation(Boid boid){
 			List<Vector3> positions = new List<Vector3> ();
@@ -126,10 +131,10 @@ namespace AssemblyCSharp{
 
 			/*Vector3 acceleration = new Vector3();
 			int count =0;
-			float k = 100f;
+			float k = 1f;
 			foreach (GameObject b in Boids) {
 				float dist = Vector3.Distance(boid.transform.position,b.transform.position);
-				if(dist < .25 && dist > 0){
+				if(dist < 2 && dist > 0){
 					acceleration = acceleration + (boid.transform.position - b.transform.position).normalized / dist;
 					count++;
 				}
@@ -140,7 +145,7 @@ namespace AssemblyCSharp{
 			return k*acceleration;*/
 		}
 		public Vector3 allignment(Boid boid){
-			List<Vector3> velocities = new List<Vector3> ();
+			/*List<Vector3> velocities = new List<Vector3> ();
 			Vector3 thisVelocity = boid.velocity;
 			foreach (GameObject b in Boids) {
 				Boid boids = b.GetComponent<Boid>();
@@ -160,11 +165,11 @@ namespace AssemblyCSharp{
 			accel = kAlignment * distance;
 
 			//Vector3 accel = distance / 100;
-			return accel;
-			/*
+			return accel;*/
+
 			Vector3 accel = new Vector3();
 			int count =0;
-			float k = 0.8f;
+			float k = 0.08f;
 			foreach (GameObject b in Boids) {
 				float dist = Vector3.Distance(boid.transform.position,b.transform.position);
 				if(dist < 30 && dist > 0){
@@ -178,7 +183,7 @@ namespace AssemblyCSharp{
 				accel = Vector3.ClampMagnitude(accel, 1);
 			}
 
-			return k*accel;*/
+			return k*accel;
 		}
 
 		public void limitVel(Boid boid){
@@ -189,59 +194,97 @@ namespace AssemblyCSharp{
 			}
 		}
 
+		public void limitVelPred(Predator pred){
+			float vlim = .02f;
+			Vector3 vel = new Vector3 (0.0f, 0.0f, 0.0f);
+			if(pred.velocity.magnitude > vlim){
+				pred.velocity = (pred.velocity / pred.velocity.magnitude) * vlim;
+			}
+		}
+
 		public Vector3 limitPos(Boid boid){
-			int xmin = -3;
-			int xmax = 3;
-			int ymin = -3; 
-			int ymax = 3;
-			int zmin = -3;
-			int zmax = 3;
+			int xmin = -10;
+			int xmax = 10;
+			int ymin = -10; 
+			int ymax = 10;
+			int zmin = -10;
+			int zmax = 10;
 			Vector3 vel = new Vector3 (0.0f, 0.0f, 0.0f);
 
 			if(boid.transform.position.x < xmin){
-				vel.x = .02f;
+				vel.x = 0.002f;
 			}
 			else if (boid.transform.position.x > xmax){
-				vel.x = -.02f;
+				vel.x = -0.002f;
 			}
 			if(boid.transform.position.y < ymin){
-				vel.y = .02f;
+				vel.y = 0.002f;
 			}
 			else if (boid.transform.position.y > ymax){
-				vel.y = -.02f;
+				vel.y = -0.002f;
 			}
 			if(boid.transform.position.z < zmin){
-				vel.z = .02f;
+				vel.z = 0.002f;
 			}
-			else if (boid.transform.position.x > zmax){
-				vel.z = -.02f;
+			else if (boid.transform.position.z > zmax){
+				vel.z = -0.002f;
 			}
 
 			return vel;
 		}
 
-		float t =0;
-		float speed = (2*Mathf.PI)/3;
-		float radius = 20;
+		float t =0.0f;
+		float speed = (2*Mathf.PI)/200.0f;
+		float radius = 100.0f;
 		public Vector3 attraction(Boid boid){
 			t += speed*Time.deltaTime;
 			Vector3 loc = new Vector3 ((float)Math.Cos (t)*radius, 0.0f, (float)Math.Sin (t)*radius);
 
-			return (loc - boid.transform.position) / 1000;
+			return (Predator.transform.position - boid.transform.position).normalized;
 		}
 
-		public void chasePrey(){
+		public Vector3 chasePrey(Predator predator){
+			Vector3 accel = new Vector3();
+			int count =0;
+			float k = 0.001f;
+			foreach (GameObject b in Boids) {
+				float dist = Vector3.Distance(predator.transform.position,b.transform.position);
+				if(dist < .3 && dist > 0){
+					accel = accel + b.transform.position;
+					count++;
+				}
+				if(count > 0){
+					accel = accel / count;
+					return (accel - predator.transform.position).normalized;
+				}
+			}
+			return (k*accel).normalized;
 		}
 
+		int k1 =1;
+		int k2 =1;
+		int k3 =1;
+		int k4 =20;
+		int k5 =1;
 		public void Update(){
 			foreach(GameObject b in Boids){
 				Boid boid = b.GetComponent<Boid>();
-				Vector3 a1=cohesion (boid);
-				Vector3 a2=seperation (boid);
-				Vector3 a3=allignment (boid);
-				Vector3 a4=attraction(boid);
-				Vector3 a5 = limitPos(boid);
-				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt + a4*dt + a5*dt;// + a4*dt+ a5*dt;
+
+				Vector3 a4 = new Vector3();
+				if((b.transform.position - Predator.transform.position).magnitude<.08){
+					k1 = -1;
+					a4 = -k4*attraction(boid);
+				}
+				else{
+					k1 = 1;
+					a4 = Vector3.zero;
+				}
+				Vector3 a1=k1*cohesion(boid);
+				Vector3 a2=k2*seperation(boid);
+				Vector3 a3=k3*allignment(boid);
+//				Vector3 a4=k4*attraction(boid);
+				Vector3 a5=k5*limitPos(boid);
+				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt +a4*dt+ a5*dt;// + a4*dt+ a5*dt;
 				float rand1 = (float)GetRandomNumber (-.01,.01);
 				float rand2 = (float)GetRandomNumber (-.01,.01);
 				float rand3 = (float)GetRandomNumber (-.01,.01);
@@ -250,6 +293,12 @@ namespace AssemblyCSharp{
 				boid.velocity.z = boid.velocity.z + rand3;
 				limitVel(boid);
 				boid.move();
+			}
+			foreach(GameObject p in Predators){
+				Predator predator = p.GetComponent<Predator>();
+				predator.velocity = predator.velocity + chasePrey(predator);
+				limitVelPred (predator);
+				predator.move();
 			}
 		}
 	}

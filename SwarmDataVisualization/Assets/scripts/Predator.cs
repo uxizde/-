@@ -12,7 +12,7 @@ public class Predator : MonoBehaviour {
 		transform.position = transform.position+velocity;
 	}
 
-	public void Update(){
-		move ();
-	}
+	//public void Update(){
+		//move ();
+	//}
 }
