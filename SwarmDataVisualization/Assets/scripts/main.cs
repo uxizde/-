@@ -29,12 +29,14 @@ namespace AssemblyCSharp{
 				boid.name = "boid"+i;
 				float rand1 = (float)GetRandomNumber (-2.0,2.0);
 				float rand2 = (float)GetRandomNumber (-2.0,2.0);
-				boid.transform.position = new Vector3(rand1, 0.0f, rand2);
+				float rand3 = (float)GetRandomNumber (-2.0,2.0);
+				boid.transform.position = new Vector3(rand1, 0.0f, rand3);
 
 				Boid b = boid.GetComponent<Boid>();
 				rand1 = (float)GetRandomNumber (-.1,.1);
 				rand2 = (float)GetRandomNumber (-.1,.1);
-				b.velocity = new Vector3(rand1,0.0f,rand2);
+				rand3 = (float)GetRandomNumber (-.1,.1);
+				b.velocity = new Vector3(rand1,0.0f,rand3);
 
 				Boids.Add (boid);
 			}
@@ -77,16 +79,15 @@ namespace AssemblyCSharp{
 */
 			float kCohesion2 = -0.001f;
 
-			if(distance.sqrMagnitude > 3){
+			if(distance.sqrMagnitude > 3){//if distance between boid and com is more then 3
 			//	accel = distance / 100;
+			//	accel = kCohesion*(distance / distance.sqrMagnitude) + kCohesion2*(distance / distance.magnitude);
 				accel = kCohesion*(distance / distance.sqrMagnitude) + kCohesion2*(distance / distance.magnitude);
 			}
 			else 
 				accel = Vector3.zero;
 
 			return accel;
-
-			//return accel;
 		}
 		public Vector3 seperation(Boid boid){
 			List<Vector3> positions = new List<Vector3> ();
@@ -101,7 +102,7 @@ namespace AssemblyCSharp{
 			List<Vector3> accelIs = new List<Vector3> ();
 			foreach (Vector3 position in positions) {
 				Vector3 distanceI = thisPosition - position;
-				if(distanceI.magnitude < 2){
+				if(distanceI.magnitude < 5){//if distance between boids is less then 2
 					Vector3 accelI = distanceI / distanceI.sqrMagnitude;
 					accelIs.Add (accelI);
 				}
@@ -148,9 +149,10 @@ namespace AssemblyCSharp{
 			//	accel = distance / distance.sqrMagnitude;
 			//}
 			//else{ 
+
 			accel = kAlignment * distance;
 			//}
-			
+
 			//Vector3 accel = distance / 100;
 			return accel;
 		}
@@ -162,6 +164,10 @@ namespace AssemblyCSharp{
 				Vector3 a2=seperation (boid);
 				Vector3 a3=allignment (boid);
 				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt; //a1*dt+a2*dt+a3*dt;
+				float rand1 = (float)GetRandomNumber (-.01,.01);
+				float rand2 = (float)GetRandomNumber (-.01,.01);
+				boid.velocity.x = boid.velocity.x + rand1;
+				boid.velocity.z = boid.velocity.z + rand2;
 				boid.move();
 			}
 		}
