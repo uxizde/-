@@ -8,14 +8,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 namespace AssemblyCSharp{
 	public class main : MonoBehaviour {
 		public GameObject Boid;
 		public List<GameObject> Boids;
-		int numbBoids = 5;
-		public int dt = 1;
+		int numbBoids =50;
+		public float dt = 0.005f;
+		const float kCohesion = -0.01f;
+		const float kSeperation = 0.0001f;
+		const float kAlignment = -0.005f;
 
 		public void Start(){
 			Boids = new List<GameObject>();
@@ -23,10 +27,14 @@ namespace AssemblyCSharp{
 			for(int i=0;i<numbBoids;i++){
 				GameObject boid = (GameObject)Instantiate(Boid);
 				boid.name = "boid"+i;
-				boid.transform.position = new Vector3(0f, 0f, 0.0f+i);
+				float rand1 = (float)GetRandomNumber (-2.0,2.0);
+				float rand2 = (float)GetRandomNumber (-2.0,2.0);
+				boid.transform.position = new Vector3(rand1, 0.0f, rand2);
 
 				Boid b = boid.GetComponent<Boid>();
-				b.velocity = new Vector3(0.05f,0.0f,0.0f);
+				rand1 = (float)GetRandomNumber (-.1,.1);
+				rand2 = (float)GetRandomNumber (-.1,.1);
+				b.velocity = new Vector3(rand1,0.0f,rand2);
 
 				Boids.Add (boid);
 			}
@@ -35,21 +43,117 @@ namespace AssemblyCSharp{
 //			}
 		}
 
-		public Vector3 cohesion(Boid boid){
-			Vector3 a1 = new Vector3(0.0f,0.0f,0.0f);
+		static System.Random random = new System.Random();
+		public double GetRandomNumber(double minimum, double maximum)
+		{ 
+			return random.NextDouble() * (maximum - minimum) + minimum;
+		}
 
-			return a1;
+		public Vector3 cohesion(Boid boid){
+			List<Vector3> positions = new List<Vector3> ();
+			Vector3 thisPosition = boid.transform.position;
+			foreach (GameObject b in Boids) {
+				Boid boids = b.GetComponent<Boid>();
+
+				if (boids != boid)
+					positions.Add (b.transform.position);
+			}
+			// positions now contain all positions of other boids
+			Vector3 sumPosition = new Vector3 (0.0f, 0.0f, 0.0f);
+			foreach (Vector3 position in positions) {
+				sumPosition = sumPosition + position;
+			}
+			Vector3 positionCm = sumPosition / (Boids.Count-1);
+			Vector3 distance = thisPosition - positionCm;
+			Vector3 accel = new Vector3 (0.0f, 0.0f, 0.0f);
+/*
+			if(distance.sqrMagnitude < 80){
+				//accel = distance / distance.sqrMagnitude;
+				accel = distance / distance.magnitude;
+			}
+			else{ 
+				accel = distance / 100;
+			}
+*/
+			float kCohesion2 = -0.001f;
+
+			if(distance.sqrMagnitude > 3){
+			//	accel = distance / 100;
+				accel = kCohesion*(distance / distance.sqrMagnitude) + kCohesion2*(distance / distance.magnitude);
+			}
+			else 
+				accel = Vector3.zero;
+
+			return accel;
+
+			//return accel;
 		}
 		public Vector3 seperation(Boid boid){
-			Vector3 a2 = new Vector3(0.0f,0.0f,0.0f);
+			List<Vector3> positions = new List<Vector3> ();
+			Vector3 thisPosition = boid.transform.position;
+
+			foreach (GameObject b in Boids) {
+				Boid boids = b.GetComponent<Boid>();
+				if (boids != boid)
+					positions.Add (b.transform.position);
+			}
+			// positions now contain all positions of other boids
+			List<Vector3> accelIs = new List<Vector3> ();
+			foreach (Vector3 position in positions) {
+				Vector3 distanceI = thisPosition - position;
+				if(distanceI.magnitude < 2){
+					Vector3 accelI = distanceI / distanceI.sqrMagnitude;
+					accelIs.Add (accelI);
+				}
 			
-			return a2;
+			}
+			// accelIs now contain all pseudo-separation-accelerations (not
+			// multiplied with the constant) due to each of the other boids
+			Vector3 sumAccelI = new Vector3 (0.0f, 0.0f, 0.0f);
+			foreach (Vector3 accelI in accelIs) {
+				sumAccelI = sumAccelI + accelI;
+			}
+
+			return kSeperation * sumAccelI;
+			/*
+			Vector3 acceleration = new Vector3 (0.0f, 0.0f, 0.0f);
+			foreach (GameObject b in Boids) {
+				Boid boids = b.GetComponent<Boid>();
+				if (boids != boid){
+					if((boid.transform.position - b.transform.position).magnitude<100){
+						acceleration = acceleration - (boid.transform.position - b.transform.position);
+					}
+				}
+			}
+			return acceleration;*/
 		}
 		public Vector3 allignment(Boid boid){
-			Vector3 a3 = new Vector3(0.0f,0.0f,0.0f);
+			List<Vector3> velocities = new List<Vector3> ();
+			Vector3 thisVelocity = boid.velocity;
+			foreach (GameObject b in Boids) {
+				Boid boids = b.GetComponent<Boid>();
+				
+				if (boids != boid)
+					velocities.Add (boids.velocity);
+			}
+			// positions now contain all positions of other boids
+			Vector3 sumVelocities = new Vector3 (0.0f, 0.0f, 0.0f);
+			foreach (Vector3 velocity in velocities) {
+				sumVelocities = sumVelocities + velocity;
+			}
+			Vector3 velocityCm = sumVelocities / (Boids.Count-1);
+			Vector3 distance = thisVelocity - velocityCm;
+			Vector3 accel = new Vector3 (0.0f, 0.0f, 0.0f);
+			//if(distance.sqrMagnitude < 8000){
+			//	accel = distance / distance.sqrMagnitude;
+			//}
+			//else{ 
+			accel = kAlignment * distance;
+			//}
 			
-			return a3;
-	}
+			//Vector3 accel = distance / 100;
+			return accel;
+		}
 
 		public void Update(){
 			foreach(GameObject b in Boids){
@@ -57,7 +161,7 @@ namespace AssemblyCSharp{
 				Vector3 a1=cohesion (boid);
 				Vector3 a2=seperation (boid);
 				Vector3 a3=allignment (boid);
-				boid.velocity = boid.velocity + a1*dt+a2*dt+a3*dt;
+				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt; //a1*dt+a2*dt+a3*dt;
 				boid.move();
 			}
 		}
