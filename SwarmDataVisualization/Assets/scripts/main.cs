@@ -10,28 +10,55 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-namespace AssemblyCSharp
-{
+namespace AssemblyCSharp{
 	public class main : MonoBehaviour {
-			public GameObject Boid;
-			
+		public GameObject Boid;
+		public List<GameObject> Boids;
+		int numbBoids = 5;
+		public int dt = 1;
+
 		public void Start(){
+			Boids = new List<GameObject>();
+
+			for(int i=0;i<numbBoids;i++){
 				GameObject boid = (GameObject)Instantiate(Boid);
-				boid.transform.position = new Vector3(0, 0, 0);
+				boid.name = "boid"+i;
+				boid.transform.position = new Vector3(0f, 0f, 0.0f+i);
+
+				Boid b = boid.GetComponent<Boid>();
+				b.velocity = new Vector3(0.05f,0.0f,0.0f);
+
+				Boids.Add (boid);
+			}
+//			foreach(GameObject b in boidList){
+//				print (b.name);
+//			}
 		}
 
-/*		public Vector3 cohesion(Boid boid){
+		public Vector3 cohesion(Boid boid){
+			Vector3 a1 = new Vector3(0.0f,0.0f,0.0f);
 
+			return a1;
 		}
 		public Vector3 seperation(Boid boid){
+			Vector3 a2 = new Vector3(0.0f,0.0f,0.0f);
 			
+			return a2;
 		}
 		public Vector3 allignment(Boid boid){
+			Vector3 a3 = new Vector3(0.0f,0.0f,0.0f);
 			
-		}*/
+			return a3;
+	}
 
 		public void Update(){
-
+			foreach(GameObject b in Boids){
+				Boid boid = b.GetComponent<Boid>();
+				Vector3 a1=cohesion (boid);
+				Vector3 a2=seperation (boid);
+				Vector3 a3=allignment (boid);
+				boid.velocity = boid.velocity + a1*dt+a2*dt+a3*dt;
+			}
 		}
 	}
 }
