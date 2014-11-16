@@ -249,7 +249,7 @@ namespace AssemblyCSharp{
 			float k = 0.001f;
 			foreach (GameObject b in Boids) {
 				float dist = Vector3.Distance(predator.transform.position,b.transform.position);
-				if(dist < .3 && dist > 0){
+				if(dist < 1.0 && dist > 0){
 					accel = accel + b.transform.position;
 					count++;
 				}
@@ -280,11 +280,13 @@ namespace AssemblyCSharp{
 					a4 = Vector3.zero;
 				}
 				Vector3 a1=k1*cohesion(boid);
-				Vector3 a2=k2*seperation(boid);
+//				Vector3 a2=k2*seperation(boid);
+				Vector3 a2 = new Vector3(0.0f, 0.0f, 0.0f);
 				Vector3 a3=k3*allignment(boid);
 				//				Vector3 a4=k4*attraction(boid);
 				Vector3 a5=k5*limitPos(boid);
-				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt +a4*dt+ a5*dt;// + a4*dt+ a5*dt;
+//				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt +a4*dt+ a5*dt;// + a4*dt+ a5*dt;
+//				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt + a5*dt;// + a4*dt+ a5*dt;
 				float rand1 = (float)GetRandomNumber (-.01,.01);
 				float rand2 = (float)GetRandomNumber (-.01,.01);
 				float rand3 = (float)GetRandomNumber (-.01,.01);
