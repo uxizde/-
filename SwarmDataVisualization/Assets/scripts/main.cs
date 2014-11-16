@@ -23,8 +23,18 @@ namespace AssemblyCSharp{
 		const float kCohesion = -0.001f;
 		const float kSeperation = 0.0001f;
 		const float kAlignment = -0.01f;
+
+		AudioClip calm;
+		AudioClip excited;
+		Boolean isCalm = true;
+		Boolean isExcited = false;
 		
 		public void Start(){
+			var guiText1 = GameObject.Find("numBoids").guiText;
+			var guiText2 = GameObject.Find("numPreds").guiText;
+			guiText1.text = "Boids: " + numbBoids;
+			guiText2.text = "Preds: " + numbPreds;
+
 			Boids = new List<GameObject>();
 			Predators = new List<GameObject>();
 			
@@ -34,7 +44,7 @@ namespace AssemblyCSharp{
 				float rand1 = (float)GetRandomNumber (-5.0,5.0);
 				float rand2 = (float)GetRandomNumber (-5.0,5.0);
 				float rand3 = (float)GetRandomNumber (-5.0,5.0);
-				boid.transform.position = new Vector3(rand1, 0f, rand3);
+				boid.transform.position = new Vector3(rand1, rand2, rand3);
 				
 				Boid b = boid.GetComponent<Boid>();
 				rand1 = (float)GetRandomNumber (-.1,.1);
@@ -128,45 +138,8 @@ namespace AssemblyCSharp{
 			}
 			
 			return kSeperation * sumAccelI;
-			
-			/*Vector3 acceleration = new Vector3();
-			int count =0;
-			float k = 1f;
-			foreach (GameObject b in Boids) {
-				float dist = Vector3.Distance(boid.transform.position,b.transform.position);
-				if(dist < 2 && dist > 0){
-					acceleration = acceleration + (boid.transform.position - b.transform.position).normalized / dist;
-					count++;
-				}
-				if(count > 0){
-					acceleration = acceleration / count;
-				}
-			}
-			return k*acceleration;*/
 		}
 		public Vector3 allignment(Boid boid){
-			/*List<Vector3> velocities = new List<Vector3> ();
-			Vector3 thisVelocity = boid.velocity;
-			foreach (GameObject b in Boids) {
-				Boid boids = b.GetComponent<Boid>();
-				
-				if (boids != boid)
-					velocities.Add (boids.velocity);
-			}
-			// positions now contain all positions of other boids
-			Vector3 sumVelocities = new Vector3 (0.0f, 0.0f, 0.0f);
-			foreach (Vector3 velocity in velocities) {
-				sumVelocities = sumVelocities + velocity;
-			}
-			Vector3 velocityCm = sumVelocities / (Boids.Count-1);
-			Vector3 distance = thisVelocity - velocityCm;
-			Vector3 accel = new Vector3 (0.0f, 0.0f, 0.0f);
-
-			accel = kAlignment * distance;
-
-			//Vector3 accel = distance / 100;
-			return accel;*/
-			
 			Vector3 accel = new Vector3();
 			int count =0;
 			float k = 0.08f;
@@ -253,6 +226,39 @@ namespace AssemblyCSharp{
 			}
 			return (k*accel).normalized;
 		}
+
+		public void PlayAudio(){
+			if ( isCalm )
+			{
+				if ( audio.clip != calm )
+				{
+					audio.Stop();
+					audio.clip = calm;
+				}
+				
+				if ( !audio.isPlaying )
+				{
+					audio.Play();
+				}
+			}
+			else if ( isExcited )
+			{
+				if ( audio.clip != excited )
+				{
+					audio.Stop();
+					audio.clip = excited;
+				}
+				
+				if ( !audio.isPlaying )
+				{
+					audio.Play();
+				}
+			}
+			else
+			{
+				audio.Stop();
+			}
+		}
 		
 		int k1 =1;
 		int k2 =1;
@@ -261,17 +267,27 @@ namespace AssemblyCSharp{
 		int k5 =1;
 		public void Update(){
 			foreach(GameObject b in Boids){
+				PlayAudio ();
 				Boid boid = b.GetComponent<Boid>();
-				
+
 				Vector3 a4 = new Vector3();
-				if((b.transform.position - Predator.transform.position).magnitude<=1){
-					print ("omg"+b.name);
+				if((b.transform.position - Predator.transform.position).magnitude<=1.2f && (b.transform.position - Predator.transform.position).magnitude > 0.75){
+					isCalm = false;
+					isExcited = true;
+					print ("omgattacked"+b.name);
 					k1 = -1;
 					a4 = -k4*attraction(boid);
 					boid.vlim = 0.1f;
 					boid.velocity =boid.velocity*2;
+	
+				}
+				else if((b.transform.position - Predator.transform.position).magnitude<=0.75){
+					print ("omgdestroyed"+b.name);
+					//Destroy (b);
 				}
 				else{
+					isCalm = true;
+					isExcited = false;
 					k1 = 1;
 					a4 = Vector3.zero;
 				}
@@ -280,7 +296,7 @@ namespace AssemblyCSharp{
 				Vector3 a3=k3*allignment(boid);
 				//				Vector3 a4=k4*attraction(boid);
 				Vector3 a5=k5*limitPos(boid);
-				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt +a4*dt+ a5*dt;// + a4*dt+ a5*dt;
+				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt +a4*dt+ a5*dt;
 				float rand1 = (float)GetRandomNumber (-.01,.01);
 				float rand2 = (float)GetRandomNumber (-.01,.01);
 				float rand3 = (float)GetRandomNumber (-.01,.01);
