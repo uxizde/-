@@ -58,6 +58,7 @@ namespace AssemblyCSharp{
 				Vector3 a2=seperation (boid);
 				Vector3 a3=allignment (boid);
 				boid.velocity = boid.velocity + a1*dt+a2*dt+a3*dt;
+				boid.move();
 			}
 		}
 	}
