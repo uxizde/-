@@ -14,6 +14,7 @@ using UnityEngine;
 namespace AssemblyCSharp{
 	public class main : MonoBehaviour {
 		public GameObject Boid;
+		public GameObject Predator;
 		public List<GameObject> Boids;
 		int numbBoids =50;
 		public float dt = 0.005f;
@@ -24,39 +25,41 @@ namespace AssemblyCSharp{
 		public void Start(){
 			Boids = new List<GameObject>();
 
+			GameObject pred = (GameObject)Instantiate (Predator);
+			pred.transform.position = new Vector3(-5f,0f,-5f);
+			Predator p = pred.GetComponent<Predator>();
+			p.velocity = new Vector3(0.08f,0.0f,0.08f);
+			
 			for(int i=0;i<numbBoids;i++){
 				GameObject boid = (GameObject)Instantiate(Boid);
 				boid.name = "boid"+i;
 				float rand1 = (float)GetRandomNumber (-2.0,2.0);
 				float rand2 = (float)GetRandomNumber (-2.0,2.0);
 				float rand3 = (float)GetRandomNumber (-2.0,2.0);
-				boid.transform.position = new Vector3(rand1, rand2, rand3);
+				boid.transform.position = new Vector3(rand1, 0f, rand3);
 
 				Boid b = boid.GetComponent<Boid>();
 				rand1 = (float)GetRandomNumber (-.1,.1);
 				rand2 = (float)GetRandomNumber (-.1,.1);
 				rand3 = (float)GetRandomNumber (-.1,.1);
-				b.velocity = new Vector3(rand1,rand2,rand3);
+				b.velocity = new Vector3(rand1,0f,rand3);
 
 				Boids.Add (boid);
 			}
-//			foreach(GameObject b in boidList){
-//				print (b.name);
-//			}
+
 		}
 
 		static System.Random random = new System.Random();
-		public double GetRandomNumber(double minimum, double maximum)
-		{ 
+		public double GetRandomNumber(double minimum, double maximum){ 
 			return random.NextDouble() * (maximum - minimum) + minimum;
 		}
 
 		public Vector3 cohesion(Boid boid){
 			List<Vector3> positions = new List<Vector3> ();
 			Vector3 thisPosition = boid.transform.position;
+			Vector3 predPosition = Predator.transform.position;
 			foreach (GameObject b in Boids) {
 				Boid boids = b.GetComponent<Boid>();
-
 				if (boids != boid)
 					positions.Add (b.transform.position);
 			}
@@ -78,10 +81,8 @@ namespace AssemblyCSharp{
 			}
 */
 			float kCohesion2 = -0.001f;
-
-			if(distance.sqrMagnitude > 3){//if distance between boid and com is more then 3
+			if(distance.sqrMagnitude > 3&&(predPosition - thisPosition).magnitude >5){//if distance between boid and com is more then 3
 			//	accel = distance / 100;
-			//	accel = kCohesion*(distance / distance.sqrMagnitude) + kCohesion2*(distance / distance.magnitude);
 				accel = kCohesion*(distance / distance.sqrMagnitude) + kCohesion2*(distance / distance.magnitude);
 			}
 			else 
@@ -157,6 +158,10 @@ namespace AssemblyCSharp{
 			return accel;
 		}
 
+		public void chasePrey(){
+
+		}
+
 		public void Update(){
 			foreach(GameObject b in Boids){
 				Boid boid = b.GetComponent<Boid>();
@@ -168,7 +173,7 @@ namespace AssemblyCSharp{
 				float rand2 = (float)GetRandomNumber (-.01,.01);
 				float rand3 = (float)GetRandomNumber (-.01,.01);
 				boid.velocity.x = boid.velocity.x + rand1;
-				boid.velocity.y = boid.velocity.y + rand2;
+				//boid.velocity.y = boid.velocity.y + rand2;
 				boid.velocity.z = boid.velocity.z + rand3;
 				boid.move();
 			}
