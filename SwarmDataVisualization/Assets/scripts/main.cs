@@ -30,13 +30,13 @@ namespace AssemblyCSharp{
 				float rand1 = (float)GetRandomNumber (-2.0,2.0);
 				float rand2 = (float)GetRandomNumber (-2.0,2.0);
 				float rand3 = (float)GetRandomNumber (-2.0,2.0);
-				boid.transform.position = new Vector3(rand1, 0.0f, rand3);
+				boid.transform.position = new Vector3(rand1, rand2, rand3);
 
 				Boid b = boid.GetComponent<Boid>();
 				rand1 = (float)GetRandomNumber (-.1,.1);
 				rand2 = (float)GetRandomNumber (-.1,.1);
 				rand3 = (float)GetRandomNumber (-.1,.1);
-				b.velocity = new Vector3(rand1,0.0f,rand3);
+				b.velocity = new Vector3(rand1,rand2,rand3);
 
 				Boids.Add (boid);
 			}
@@ -163,11 +163,13 @@ namespace AssemblyCSharp{
 				Vector3 a1=cohesion (boid);
 				Vector3 a2=seperation (boid);
 				Vector3 a3=allignment (boid);
-				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt; //a1*dt+a2*dt+a3*dt;
+				boid.velocity = boid.velocity + a1*dt + a2*dt + a3*dt;
 				float rand1 = (float)GetRandomNumber (-.01,.01);
 				float rand2 = (float)GetRandomNumber (-.01,.01);
+				float rand3 = (float)GetRandomNumber (-.01,.01);
 				boid.velocity.x = boid.velocity.x + rand1;
-				boid.velocity.z = boid.velocity.z + rand2;
+				boid.velocity.y = boid.velocity.y + rand2;
+				boid.velocity.z = boid.velocity.z + rand3;
 				boid.move();
 			}
 		}
