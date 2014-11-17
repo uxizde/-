@@ -31,7 +31,9 @@ Model: the acceleration of each boid points away from the sum of distances of ne
 
 ### Vision
 
-Vision
+Each entity, whether it is a prey or predator, has vision, within which it perceives food or danger. Therefore our model
+
+Model: interaction considered only within a certain radius.
 
 ## References
 
